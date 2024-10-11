@@ -7,11 +7,8 @@ amqp.connect('amqp://localhost', (_err, conn) => {
         // Name of the queue
         const q = queues.TASK_QUEUE
         // Declare the queue
-        channel.assertQueue(q, {durable: true}, (_err, _ok) => {
-            if (_err) {
-                console.log("Error creating queue", _err.message)
-                process.exit(1)
-            }
+        channel.assertExchange(q, 'fanout', {
+            durable: false
         })
 
         // Wait for Queue Messages
@@ -22,10 +19,9 @@ amqp.connect('amqp://localhost', (_err, conn) => {
                 console.log(` [x] Received ${msg.content.toString()}`)
                 setTimeout(() => {
                     console.log(" [x] Done")
-                    channel.ack(msg) // acknowledge the message, if not acknowledged, it will be requeued
                 }, secs * 1000)
             }, {
-                noAck: false // manual acknowledgment mode
+                noAck: true
             }
         )
     })

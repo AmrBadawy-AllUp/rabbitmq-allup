@@ -13,21 +13,12 @@ amqp.connect('amqp://localhost', (_err, conn) => {
             console.log("Error creating channel")
             process.exit(1)
         }
-        const queue = queues.TASK_QUEUE;
         const msg = process.argv.slice(2).join(' ') || "Hello World!...";
 
-        channel.assertQueue(queue, {
-            durable: true // Message will survive broker restarts
-        }, (_err, _ok) => {
-            if (_err) {
-                console.log("Error creating queue", _err.message)
-                process.exit(1)
-            }
+        channel.assertExchange(queues.LOGS, 'fanout', {
+            durable: false
         });
-        channel.prefetch(1); // Don't dispatch a new message to a worker until it has processed and acknowledged the previous one
-        channel.sendToQueue(queue, Buffer.from(msg), {
-            persistent: true // Message will be saved to disk
-        });
+        channel.publish(queues.LOGS, '', Buffer.from(msg));
         console.log(" [x] Sent '%s'", msg);
         // Close the connection and exit
         setTimeout(() => {
