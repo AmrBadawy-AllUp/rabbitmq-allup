@@ -20,7 +20,7 @@ ampq.connect('amqp://localhost', (error, connection) => {
         channel.assertExchange(Exchange.TOPIC_LOGS, 'topic', {
             durable: false
         })
-        channel.publish('topic_logs', `${bindingKey}.${severity}`, Buffer.from(message)); // severity is the routing key
+        channel.publish(Exchange.TOPIC_LOGS, `${bindingKey}.${severity}`, Buffer.from(message)); // severity is the routing key
 
         console.log(` [x] Sent ${bindingKey}.${severity}: ${message}`);
 
